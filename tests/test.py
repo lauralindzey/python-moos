@@ -4,7 +4,12 @@ unittests for pymoos
 """
 
 import unittest
-import subprocess
+from subprocess import Popen, STDOUT
+try:
+    from subprocess import DEVNULL
+except ImportError:
+    import os
+    DEVNULL = open(os.devnull, 'wb')
 import time
 import logging
 logging.basicConfig(level=logging.DEBUG,
@@ -25,8 +30,8 @@ class pyMOOSTestCase(unittest.TestCase):
     def setUpClass(cls):
         try:
             logger.info('starting MOOSDB ...')
-            cls.moosdb_process = subprocess.Popen(['MOOSDB',
-                            '--moos_community=pymoos_test_db'])
+            cls.moosdb_process = Popen('MOOSDB --moos_community=pymoos_test_db &> /dev/null',
+                            shell=True)
             logger.info('starting MOOSDB done')
         except OSError as ose:
             logger.error("Error while launching MOOSDB !"
@@ -36,7 +41,7 @@ class pyMOOSTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         logger.info('killing MOOSDB ...')
-        cls.moosdb_process.kill()
+        cls.moosdb_process.terminate()
         logger.info('killing MOOSDB done')
 
     def test_00_run_close(self):

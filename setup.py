@@ -3,6 +3,7 @@ import re
 import sys
 import platform
 import subprocess
+import pathlib
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
@@ -56,13 +57,21 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+# The directory containing this file
+HERE = pathlib.Path(__file__).parent
+
+# The text of the README file
+README = (HERE / "README.md").read_text()
+
 setup(
     name='pymoos',
     version='0.0.1',
     author='Mohamed Saad Ibn Seddik',
     author_email='ms.ibnseddik@gmail.com',
     description='MOOS python wrapper.',
-    long_description='',
+    long_description=README,
+    long_description_content_type="text/markdown",
+    url="https://github.com/msis/python-moos",
     ext_modules=[CMakeExtension('pymoos')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
